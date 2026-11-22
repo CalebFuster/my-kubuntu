@@ -10,6 +10,7 @@ _path_prepend() {
 }
 _path_prepend "$HOME/.local/bin"      # pipx, uv tools
 _path_prepend "$HOME/.fw_setup"
+_path_prepend "${CARGO_HOME:-$HOME/.cargo}/bin"   # rustup/cargo
 export PATH
 unset -f _path_prepend
 

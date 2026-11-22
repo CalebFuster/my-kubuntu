@@ -1,0 +1,6 @@
+# Docker Engine from Docker's apt repo (added in modules/05-apt-repos.sh)
+docker-ce
+docker-ce-cli
+containerd.io
+docker-buildx-plugin
+docker-compose-plugin

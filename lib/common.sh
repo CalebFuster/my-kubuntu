@@ -136,3 +136,36 @@ ensure_block() {
     printf '\n# >>> %s >>>\n%s\n# <<< %s <<<\n' "$marker" "$content" "$marker" >> "$file"
     ok "added $marker block to $file"
 }
+
+# ---------- apt repositories ----------
+# apt_add_repo NAME KEY_URL URIS SUITES COMPONENTS
+#   Writes /etc/apt/keyrings/NAME.asc and /etc/apt/sources.list.d/NAME.sources
+#   (deb822 format, limited to this machine's arch). Sets REPOS_CHANGED=1 when
+#   something changed, so the caller can run pkg_update once at the end.
+apt_add_repo() {
+    local name="$1" key_url="$2" uris="$3" suites="$4" components="$5"
+    local key="/etc/apt/keyrings/$name.asc"
+    local list="/etc/apt/sources.list.d/$name.sources"
+    local content
+    content="Types: deb
+URIs: $uris
+Suites: $suites
+Components: $components
+Architectures: $ARCH
+Signed-By: $key"
+
+    if [ -f "$list" ] && [ -f "$key" ] && [ "$(cat "$list")" = "$content" ]; then
+        info "repo $name already configured"
+        return 0
+    fi
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        printf '    + add apt repo %s (%s %s)\n' "$name" "$uris" "$suites"
+        return 0
+    fi
+    $SUDO install -d -m 0755 /etc/apt/keyrings
+    curl -fsSL "$key_url" | $SUDO tee "$key" >/dev/null
+    $SUDO chmod a+r "$key"
+    printf '%s\n' "$content" | $SUDO tee "$list" >/dev/null
+    REPOS_CHANGED=1
+    ok "added apt repo $name"
+}

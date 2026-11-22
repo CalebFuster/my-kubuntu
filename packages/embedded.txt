@@ -1,0 +1,4 @@
+# Serial terminals (user is added to 'dialout' in modules/60-groups.sh)
+picocom
+minicom
+screen

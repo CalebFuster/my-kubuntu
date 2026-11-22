@@ -43,12 +43,12 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 
 ### Packages
 - **Base CLI:** curl, wget, git, vim, neovim, tmux, htop, unzip, zoxide, fzf, bash-completion, ca-certificates.
-- **C/C++:** build-essential, cmake, ninja-build, gdb, clang, clang-format, clang-tidy, doxygen.
-- **Python:** deadsnakes versions (list TBD) + `uv` (official installer, as uv isn't in Ubuntu's repos). **uv must only use system (deadsnakes) Pythons**: `UV_PYTHON_PREFERENCE=only-system`, `UV_PYTHON_DOWNLOADS=never`. No pipx: `uv tool install` replaces it.
+- **C/C++:** build-essential, pkg-config, cmake, ninja-build, gdb, clang, clang-format, clang-tidy, doxygen.
+- **Python:** deadsnakes **3.12 + 3.13** (+ `-dev`; 26.04 ships 3.14 as `python3`; change in `packages/python.txt`). deadsnakes publishes 26.04 packages for amd64 and arm64 (3.7–3.13, 3.15, 3.16). Plus `uv` (official installer, as uv isn't in Ubuntu's repos). **uv must only use system (deadsnakes) Pythons**: `UV_PYTHON_PREFERENCE=only-system`, `UV_PYTHON_DOWNLOADS=never`. No pipx: `uv tool install` replaces it.
 - **Venvs live in `~/.venv/<name>`** (one per tool/project, same as the Mac). This is a deliberate exception to the XDG rule. `UV_TOOL_DIR=~/.venv`, so `uv tool install konsave` → `~/.venv/konsave`, with the command linked into `~/.local/bin`. Shell helpers: `mkvenv NAME [PYVER]` and `venv NAME` (tab-completes).
-- **Node:** nvm, installed into `$XDG_DATA_HOME/nvm` (matches the `xdg` file). Default Node version TBD.
-- **Rust:** rustup with `CARGO_HOME`/`RUSTUP_HOME` under XDG (matches the `xdg` file).
-- **Docker:** Docker Engine + compose plugin. Add the shared user to the `docker` group.
+- **Node:** nvm (pinned version, `PROFILE=/dev/null` so it doesn't edit `~/.bashrc`), installed into `$XDG_DATA_HOME/nvm`. Default Node: **latest LTS** (`lts/*`). npm cache/config under XDG.
+- **Rust:** rustup (`--no-modify-path`, default profile) with `CARGO_HOME`/`RUSTUP_HOME` under XDG. `$CARGO_HOME/bin` is added to PATH by `exports`.
+- **Docker:** Docker Engine + buildx + compose plugins from Docker's apt repo (has 26.04 amd64/arm64). `DOCKER_CONFIG` under XDG. Add the shared user to the `docker` group.
 - **Serial / embedded:** picocom, minicom, screen. Add the user to the `dialout` group.
 - **SEGGER J-Link:** from the internal apt repo.
 - **STM32 tools:** **out of scope for now.**
@@ -72,8 +72,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 ## 5. Open questions
 1. SSH keys on a shared account: one shared key, or does each peer use an agent/forwarded key?
 2. Internal apt repo: URL, signing-key location, suite/component, arm64 availability.
-3. Which Python versions from deadsnakes? Default Node version?
-4. Full list of extra tools (picocom is in; what else?) and VS Code extensions.
-5. Browser policy contents for each browser.
-6. Bloat list and system-tweak specifics.
-7. Should `shell_config` changes flow back to the Mac copy, or is this a fork from now on?
+3. Full list of extra tools (picocom is in; what else?) and VS Code extensions.
+4. Browser policy contents for each browser.
+5. Bloat list and system-tweak specifics.
+6. Should `shell_config` changes flow back to the Mac copy, or is this a fork from now on?

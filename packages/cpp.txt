@@ -1,0 +1,10 @@
+# C/C++ toolchain
+build-essential
+pkg-config
+cmake
+ninja-build
+gdb
+clang
+clang-format
+clang-tidy
+doxygen

@@ -1,0 +1,6 @@
+# Extra Python versions from the deadsnakes PPA (26.04 ships 3.14 as python3).
+# -dev headers so packages with C extensions can build. No -venv: uv makes venvs.
+python3.12
+python3.12-dev
+python3.13
+python3.13-dev

@@ -1,0 +1,3 @@
+# Terminal: Ghostty (Ubuntu universe) + the font its config uses
+ghostty
+fonts-jetbrains-mono

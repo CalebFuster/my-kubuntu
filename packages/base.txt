@@ -1,0 +1,15 @@
+# Base CLI tools. One apt package per line, # for comments.
+# Every packages/*.txt file is installed by modules/10-packages.sh.
+ca-certificates
+curl
+wget
+unzip
+git
+git-lfs
+bash-completion
+vim
+neovim
+tmux
+htop
+fzf
+zoxide

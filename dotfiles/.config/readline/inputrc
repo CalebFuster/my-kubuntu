@@ -1,0 +1,25 @@
+# Keep the distro defaults, then add ours.
+$include /etc/inputrc
+
+# Option+Arrow variants that iTerm commonly emits
+"\e[1;3C": forward-word
+"\e[1;3D": backward-word
+"\e[1;9C": forward-word
+"\e[1;9D": backward-word
+"\e\e[C":  forward-word
+"\e\e[D":  backward-word
+
+set input-meta on
+set convert-meta off
+set meta-flag on
+
+# If you use vi mode in bash:
+$if mode=vi
+set keymap vi-insert
+"\e[1;3C": forward-word
+"\e[1;3D": backward-word
+"\e[1;9C": forward-word
+"\e[1;9D": backward-word
+"\e\e[C":  forward-word
+"\e\e[D":  backward-word
+$endif

@@ -1,3 +1,0 @@
-# Arch specific
-base-devel
-openssh

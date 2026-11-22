@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Install packages from packages/common.txt + packages/<pkg-mgr>.txt
+# Install every package listed in packages/*.txt
 
 mapfile -t PKGS < <(
-    read_pkg_list "$ROOT_DIR/packages/common.txt"
-    read_pkg_list "$ROOT_DIR/packages/$PKG_MGR.txt"
+    for f in "$ROOT_DIR"/packages/*.txt; do
+        [ -e "$f" ] && read_pkg_list "$f"
+    done | sort -u
 )
 
 if [ "${#PKGS[@]}" -eq 0 ]; then

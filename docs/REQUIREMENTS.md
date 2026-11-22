@@ -22,9 +22,11 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
   - Drop/neutralise: Homebrew, iTerm2, Docker Desktop, macOS app paths, personal project paths (`TrackedFolders/...`, `.ws_setup`), STM32 macOS paths, `CLAUDE_CONFIG_DIR` (TBD).
   - Rename `alias ip='curl ifconfig.me'` to **`publicip`** so it doesn't shadow the Linux `ip` command.
   - **Drop `LC_ALL=C.UTF-8`** (and the `LANG=C.UTF-8` override). Let the desktop locale apply so KDE apps aren't broken.
+- Git config: the `merge-msg` hook uses config-based hooks (`[hook "…"]`), which Ubuntu 26.04's git 2.53 ignores. It stays in the config and activates with a newer git. Don't use `core.hooksPath` as a workaround: it would disable repos' own hooks.
 - **`local.sh` is never copied or committed.** The installer creates an empty `local.sh` template for machine-specific overrides. (The Mac's `local.sh` holds a secret token, so never copy it.)
-- Also ship: `.vimrc`, nvim (NvChad starter), tmux, htop, git `ignore`. Remove the Mac-only lines (e.g. `rtp+=/opt/homebrew/opt/fzf`).
-- Git: shared account means **no global `user.name`/`user.email`**. Leave them unset so git refuses to commit until an identity is set in that repo (`git config user.name/user.email` in each repo). The installer must never write an identity.
+- Also ship: vimrc, tmux, readline, git config + `ignore`, Ghostty. Remove the Mac-only lines (e.g. `rtp+=/opt/homebrew/opt/fzf`). **No nvim config** (the neovim package stays).
+- **Everything follows XDG**: configs in `~/.config/<tool>/`, state/history in `~/.local/state/`, nothing new in `$HOME` (only exceptions: the one-line hook in `~/.bashrc`, and `~/.ssh`). Legacy `~/.vimrc`, `~/.tmux.conf`, `~/.gitconfig`, `~/.inputrc` are moved aside because they would override the XDG versions.
+- Git: placeholder identity **`user <user@user.com>`**, written once to `~/.config/git/local` (included from the main config). It is never overwritten, so it can be changed per machine.
 - SSH: keys are **copied in manually**. The installer only creates `~/.ssh` with correct permissions and a base `config` with `Include config.d/*`.
 
 ## 3. Software
@@ -49,7 +51,8 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **Serial / embedded:** picocom, minicom, screen. Add the user to the `dialout` group.
 - **SEGGER J-Link:** from the internal apt repo.
 - **STM32 tools:** **out of scope for now.**
-- **Editors:** VS Code (extensions TBD), Neovim, Vim.
+- **Editors:** VS Code (extensions TBD), Neovim (no custom config), Vim.
+- **Terminal:** **Ghostty** from Ubuntu universe (1.3.0 on 26.04), plus `fonts-jetbrains-mono`. Set as the KDE default terminal (`kdeglobals` → `TerminalApplication`/`TerminalService`).
 - **Browsers:** Waterfox (Gecko, AI features off) and Vivaldi (Chromium). Both get **configured**, not just installed (see below).
 - **KDE:** konsave (via pipx) + a saved profile in the repo.
 - **Others:** list TBD (e.g. more hardware/debug tools).

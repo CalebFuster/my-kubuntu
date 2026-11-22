@@ -1,0 +1,11 @@
+# Global gitignore — only editor/OS/env junk that never belongs in any repo.
+*~
+.DS_Store
+.idea/
+.venv
+venv
+tmp
+.mypy_cache/
+settings.local.json
+**/.claude/settings.local.json
+.npmrc

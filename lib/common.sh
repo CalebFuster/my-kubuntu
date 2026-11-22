@@ -44,29 +44,37 @@ run() {
 
 has() { command -v "$1" >/dev/null 2>&1; }
 
-# ---------- OS / package manager ----------
+# ---------- system checks ----------
+# Supported target: Kubuntu/Ubuntu 26.04 LTS, amd64 or arm64.
+SUPPORTED_UBUNTU="26.04"
+
 detect_os() {
     if [ -r /etc/os-release ]; then
         # shellcheck disable=SC1091
         . /etc/os-release
-        OS_ID="${ID:-unknown}"
-        OS_LIKE="${ID_LIKE:-}"
-        OS_VERSION="${VERSION_ID:-}"
-    else
-        OS_ID="unknown"; OS_LIKE=""; OS_VERSION=""
     fi
+    OS_ID="${ID:-unknown}"
+    OS_VERSION="${VERSION_ID:-unknown}"
+    OS_CODENAME="${VERSION_CODENAME:-${UBUNTU_CODENAME:-unknown}}"
 
-    if   has apt-get; then PKG_MGR=apt
-    elif has dnf;     then PKG_MGR=dnf
-    elif has pacman;  then PKG_MGR=pacman
-    elif has zypper;  then PKG_MGR=zypper
-    else
-        err "No supported package manager found (apt/dnf/pacman/zypper)."
+    if [ "$OS_ID" != "ubuntu" ] || ! has apt-get; then
+        err "Only Ubuntu/Kubuntu is supported (found: $OS_ID $OS_VERSION)."
         exit 1
     fi
+    if [ "$OS_VERSION" != "$SUPPORTED_UBUNTU" ]; then
+        warn "Built for Ubuntu $SUPPORTED_UBUNTU, found $OS_VERSION. Things may break."
+    fi
 
+    ARCH="$(dpkg --print-architecture)"   # amd64 | arm64
+    case "$ARCH" in
+        amd64|arm64) ;;
+        *) warn "Untested architecture: $ARCH" ;;
+    esac
+
+    USER="${USER:-$(id -un)}"
     if [ "$(id -u)" -eq 0 ]; then
         SUDO=""
+        warn "Running as root: user config will go to /root. Run as the desktop user instead."
     elif has sudo; then
         SUDO="sudo"
     else
@@ -74,37 +82,19 @@ detect_os() {
         exit 1
     fi
 
-    USER="${USER:-$(id -un)}"
-    export OS_ID OS_LIKE OS_VERSION PKG_MGR SUDO USER
+    export OS_ID OS_VERSION OS_CODENAME ARCH SUDO USER
 }
 
-pkg_update() {
-    case "$PKG_MGR" in
-        apt)    run $SUDO apt-get update -y ;;
-        dnf)    run $SUDO dnf makecache -y ;;
-        pacman) run $SUDO pacman -Sy --noconfirm ;;
-        zypper) run $SUDO zypper --non-interactive refresh ;;
-    esac
-}
+# ---------- packages (apt) ----------
+apt_get() { run $SUDO env DEBIAN_FRONTEND=noninteractive apt-get "$@"; }
 
-pkg_upgrade() {
-    case "$PKG_MGR" in
-        apt)    run $SUDO env DEBIAN_FRONTEND=noninteractive apt-get upgrade -y ;;
-        dnf)    run $SUDO dnf upgrade -y ;;
-        pacman) run $SUDO pacman -Syu --noconfirm ;;
-        zypper) run $SUDO zypper --non-interactive update ;;
-    esac
-}
+pkg_update()  { apt_get update -y; }
+pkg_upgrade() { apt_get upgrade -y; }
 
 # pkg_install pkg1 pkg2 ...
 pkg_install() {
     [ $# -eq 0 ] && return 0
-    case "$PKG_MGR" in
-        apt)    run $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y "$@" ;;
-        dnf)    run $SUDO dnf install -y "$@" ;;
-        pacman) run $SUDO pacman -S --needed --noconfirm "$@" ;;
-        zypper) run $SUDO zypper --non-interactive install "$@" ;;
-    esac
+    apt_get install -y --no-install-recommends "$@"
 }
 
 # read_pkg_list file -> prints package names (strips comments/blank lines)
@@ -114,11 +104,13 @@ read_pkg_list() {
 }
 
 # ---------- files ----------
-# link_file src dest  -> symlink, backing up an existing non-link dest
-link_file() {
+# install_file src dest
+#   Copies src to dest. Skips if identical; otherwise backs up the existing
+#   dest to dest.bak.<timestamp> first. Copies (not symlinks) so the machine
+#   doesn't depend on this folder staying around.
+install_file() {
     local src="$1" dest="$2"
-    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
-        info "already linked: $dest"
+    if [ -f "$dest" ] && [ ! -L "$dest" ] && cmp -s "$src" "$dest"; then
         return 0
     fi
     if [ -e "$dest" ] || [ -L "$dest" ]; then
@@ -126,6 +118,21 @@ link_file() {
         warn "backed up existing $dest"
     fi
     run mkdir -p "$(dirname "$dest")"
-    run ln -s "$src" "$dest"
-    ok "linked $dest -> $src"
+    run cp "$src" "$dest"
+    ok "installed $dest"
+}
+
+# ensure_block file marker content
+#   Appends content wrapped in "# >>> marker >>>" / "# <<< marker <<<" once.
+ensure_block() {
+    local file="$1" marker="$2" content="$3"
+    if [ -f "$file" ] && grep -qF "# >>> $marker >>>" "$file"; then
+        return 0
+    fi
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        printf '    + append %s block to %s\n' "$marker" "$file"
+        return 0
+    fi
+    printf '\n# >>> %s >>>\n%s\n# <<< %s <<<\n' "$marker" "$content" "$marker" >> "$file"
+    ok "added $marker block to $file"
 }

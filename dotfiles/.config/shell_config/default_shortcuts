@@ -1,0 +1,22 @@
+# Default alias
+
+# Some default shortcuts
+alias ll="ls -alh"           # My favourite command from ubuntu
+alias ..='cd ..'             # Go up one directory
+alias ...='cd ../..'         # Go up two directories
+alias ....='cd ../../..'     # Go up three directories
+alias .....='cd ../../../..' # Go up four directories
+
+
+# Juan grep command for python
+alias pygrep="find . -name \*.py | xargs grep"
+
+# Networking
+alias publicip='curl ifconfig.me'                  # Public IP address
+alias localip="hostname -I | awk '{print \$1}'"   # First local IP address
+
+alias python="python3"
+alias pip="pip3"
+alias countcodelines='find . -name "*.py" | grep -v "./(venv|build)/*" | xargs wc -l'
+alias countlines="find . -name '*.*' | xargs wc -l"
+alias reload='source ~/.bashrc'

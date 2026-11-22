@@ -1,0 +1,9 @@
+# local.sh — machine-specific config. NEVER commit this file.
+# Linux-Setup copies this template to ~/.config/shell_config/local.sh once;
+# edit that copy. It is sourced last by shell_config/bashrc.
+#
+# Put here: machine-only aliases, project paths, and secrets/tokens
+# (better: keep secrets in a password manager and load them on demand).
+
+# alias proj='cd ~/work/my-project && source .venv/bin/activate'
+# export SOME_TOKEN=...

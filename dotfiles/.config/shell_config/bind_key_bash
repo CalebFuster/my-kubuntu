@@ -1,0 +1,11 @@
+# Make tab completion case-insensitive
+bind 'set completion-ignore-case off'
+shopt -s nocaseglob
+
+# Enable menu completion for TAB
+bind 'set show-all-if-ambiguous on'
+bind '"\t": menu-complete'
+
+# Enable history search with Up/Down arrows
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'

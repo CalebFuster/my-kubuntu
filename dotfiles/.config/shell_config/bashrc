@@ -1,0 +1,29 @@
+# shell_config entry point — sourced at the end of ~/.bashrc (added by Linux-Setup).
+_SHELL_CFG="$HOME/.config/shell_config"
+
+source "$_SHELL_CFG/xdg"
+source "$_SHELL_CFG/exports"
+source "$_SHELL_CFG/default_shortcuts"
+source "$_SHELL_CFG/functions"
+source "$_SHELL_CFG/bash_functions"
+source "$_SHELL_CFG/bind_key_bash"
+source "$_SHELL_CFG/manpages_colour"
+
+# Machine-local overrides (never tracked; template: local.sh.example)
+[ -f "$_SHELL_CFG/local.sh" ] && source "$_SHELL_CFG/local.sh"
+
+unset _SHELL_CFG
+
+# History (HISTFILE is set in xdg; bash won't create the directory itself)
+mkdir -p "$(dirname "$HISTFILE")"
+export HISTSIZE=500000        # How many lines to keep in active memory
+export HISTFILESIZE=500000    # How many lines to save inside the history file
+
+# Shell PS
+if [ "$EUID" -eq 0 ]; then
+    # Prompt for ROOT (Bold Red + White path + #)
+    PS1="\[\e[1;38;5;196m\]\u@\h \[\e[1;38;5;7m\]\w\[\e[0m\] # "
+else
+    # Prompt for REGULAR USER (Cyan + Pink + $)
+    PS1="\[\e[1;38;5;45m\]\u@\h \[\e[1;38;5;206m\]\w\[\e[0m\] \$ "
+fi

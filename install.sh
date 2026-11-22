@@ -85,7 +85,7 @@ detect_os
 setup_logging
 
 info "Host:    $(hostname)"
-info "Distro:  $OS_ID $OS_VERSION (pkg manager: $PKG_MGR)"
+info "System:  $OS_ID $OS_VERSION ($OS_CODENAME), $ARCH"
 info "User:    $USER  (sudo: ${SUDO:-none, running as root})"
 info "Modules: $(for m in "${MODULES[@]}"; do printf '%s ' "$(module_name "$m")"; done)"
 [ "$DRY_RUN" -eq 1 ] && warn "DRY RUN — nothing will be changed"

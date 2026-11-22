@@ -1,0 +1,4 @@
+# Machine-local shell overrides may hold secrets — never commit.
+local.sh
+local*.sh
+!local.sh.example

@@ -1,0 +1,30 @@
+# ─── Font & Appearance ────────────────────────────────────────────────────────
+font-family = "JetBrains Mono"
+font-size = 12
+theme = Dark+
+
+# ─── Window ───────────────────────────────────────────────────────────────────
+window-padding-x = 10
+window-padding-y = 10
+
+# Transparency + blur (blur works on KDE Plasma)
+background-opacity = 0.85
+background-blur-radius = 20
+
+# Start with a larger default window size (columns x rows)
+window-width = 100
+window-height = 30
+
+# ─── Behavior ─────────────────────────────────────────────────────────────────
+term = xterm-256color
+confirm-close-surface = false
+mouse-hide-while-typing = true
+scrollback-limit = 10000
+cursor-style = block
+
+# ─── Keybindings ──────────────────────────────────────────────────────────────
+# Global shortcut via the desktop portal (KDE asks once to allow it)
+keybind = global:ctrl+shift+a=toggle_visibility
+
+# Quick terminal appearance
+quick-terminal-position = center

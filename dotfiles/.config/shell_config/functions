@@ -1,0 +1,46 @@
+# My functions
+
+# pipclean: Uninstalls all pip packages (editable and regular), optionally purges cache
+_pipclean() {
+    for package in $(pip list --editable | awk "NR>2 {print \$1}"); do
+        pip uninstall -y "$package"
+    done
+    for package in $(pip freeze | cut -d"=" -f1); do
+        pip uninstall -y "$package"
+    done
+    if [[ "$1" == "-a" ]]; then
+        pip cache purge
+    fi
+}
+
+
+# gitclean: Removes local branches whose upstream has been deleted
+_gitclean() {
+    git fetch -p
+    for branch in $(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads | awk '$2 == "[gone]" {sub("refs/heads/", "", $1); print $1}'); do
+        git branch -D "$branch"
+    done
+}
+
+
+# folderclean: Deletes __pycache__ dirs and empty folders
+_folderclean() {
+    local START_DIR=${1:-.}
+    find "$START_DIR" -type d -name "__pycache__" -exec rm -rf {} +
+    find "$START_DIR" -type d -empty -delete
+    clear
+}
+
+
+# Opens man pages with sublime if exist
+
+if command -v subl >/dev/null 2>&1; then
+    sublman() {
+        man "$1" | col -b | subl -
+    }
+fi
+
+
+alias gitclean="_gitclean"
+alias pipclean="_pipclean"
+alias folderclean="_folderclean"

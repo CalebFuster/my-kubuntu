@@ -1,0 +1,26 @@
+# Shared-account git config (managed by Linux-Setup — re-running the
+# installer replaces this file). The identity lives in ~/.config/git/local,
+# which is created once with a placeholder and never overwritten.
+[include]
+	path = ~/.config/git/local
+[core]
+	excludesfile = ~/.config/git/ignore
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[push]
+	autoSetupRemote = true
+[alias]
+	update-branch = "!f() { git fetch origin \"$1:$1\"; }; f"
+[init]
+	defaultBranch = main
+[merge]
+	ff = false
+[hook "merge-msg"]
+	event = prepare-commit-msg
+	command = sh ~/.config/git/scripts/merge-msg.sh
+[pull]
+	rebase = true
+	ff = only

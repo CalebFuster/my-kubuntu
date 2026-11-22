@@ -1,0 +1,17 @@
+# Exports
+
+# ls colors (GNU ls)
+export LS_COLORS="di=01;34:fi=00:ln=01;36:pi=40;33"
+
+# --- PATH ---
+_path_prepend() {
+    [ -d "$1" ] || return 0
+    case ":$PATH:" in *":$1:"*) ;; *) PATH="$1:$PATH" ;; esac
+}
+_path_prepend "$HOME/.local/bin"      # pipx, uv tools
+_path_prepend "$HOME/.fw_setup"
+export PATH
+unset -f _path_prepend
+
+# --- Embedded / firmware tooling ---
+[ -d "$HOME/.zephyr_sdk" ] && export ZEPHYR_SDK_INSTALL_DIR="$HOME/.zephyr_sdk/"

@@ -1,0 +1,62 @@
+" Enable syntax highlighting
+syntax on
+
+" Set a better color scheme
+colorscheme industry
+
+" Enable line numbers
+set number
+
+" Enable relative line numbers
+" set relativenumber
+
+" Set the clipboard to work with the system clipboard
+set clipboard=unnamedplus
+
+" Enable mouse support
+set mouse=a
+
+" Show matching parentheses
+set showmatch
+
+" Enable incremental search
+set incsearch
+
+" Highlight search results
+set hlsearch
+
+" Enable case-insensitive search unless there's a capital letter
+set ignorecase
+set smartcase
+
+" Set tab width to 4 spaces
+set tabstop=4
+set shiftwidth=4
+set expandtab
+
+" Display the cursor line
+" set cursorline
+
+" Show command in the status line
+set showcmd
+
+" Show the status line at the bottom
+set laststatus=2
+
+" Automatically save when switching buffers
+autocmd BufLeave * silent! wa
+
+" Better scrolling
+set scrolloff=5
+
+" Disable audible bell
+set noerrorbells
+set visualbell
+
+" Set a better indentation
+set autoindent
+set smartindent
+
+
+" XDG: keep state out of $HOME (vim reads this file from ~/.config/vim/vimrc)
+set viminfofile=~/.local/state/vim/viminfo

@@ -1,0 +1,49 @@
+
+# Prevent breaking word completion on ':'  (bash-specific)
+export COMP_WORDBREAKS=${COMP_WORDBREAKS//:/}
+
+# Enable Bash programmable completion
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+elif [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+fi
+
+
+
+_ssh_config_hosts() {
+  local cur
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Collect "Host ..." entries from ~/.ssh/config and any files it Includes
+  # (relative Include paths resolve against ~/.ssh, globs allowed), ignore wildcards
+  local hosts files f pat
+  files=(~/.ssh/config)
+  for pat in $(awk 'tolower($1)=="include" { for (i=2; i<=NF; i++) print $i }' ~/.ssh/config 2>/dev/null); do
+    case "$pat" in
+      "~"/*) pat="$HOME/${pat#\~/}" ;;
+      /*)    ;;
+      *)     pat="$HOME/.ssh/$pat" ;;
+    esac
+    for f in $pat; do [ -f "$f" ] && files+=("$f"); done
+  done
+
+  hosts=$(awk '
+    tolower($1)=="host" {
+      for (i=2; i<=NF; i++) {
+        if ($i !~ /[*?!]/) print $i
+      }
+    }' "${files[@]}" 2>/dev/null | sort -u)
+
+  COMPREPLY=( $(compgen -W "$hosts" -- "$cur") )
+  return 0
+}
+complete -F _ssh_config_hosts ssh
+
+# Git tab completion
+[ -f "$XDG_CONFIG_HOME/git/git-completion.bash" ] && source "$XDG_CONFIG_HOME/git/git-completion.bash"
+
+
+# zoxide (smarter cd)
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
+

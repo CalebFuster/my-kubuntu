@@ -1,5 +1,5 @@
 # Make tab completion case-insensitive
-bind 'set completion-ignore-case off'
+bind 'set completion-ignore-case on'
 shopt -s nocaseglob
 
 # Enable menu completion for TAB

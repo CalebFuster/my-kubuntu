@@ -21,6 +21,12 @@ while IFS= read -r -d '' src; do
     install_file "$src" "$HOME/$rel"
 done < <(find "$DOT_DIR" -type f -print0)
 
+# Scripts in ~/.local/bin must be executable (exec bits can be lost when the
+# folder is copied without git).
+for f in "$DOT_DIR"/.local/bin/*; do
+    [ -f "$f" ] && run chmod +x "$HOME/.local/bin/$(basename "$f")"
+done
+
 # Legacy dotfiles in $HOME take precedence over the XDG ones: move them aside.
 for legacy in .vimrc .tmux.conf .gitconfig .inputrc; do
     if [ -e "$HOME/$legacy" ] && [ ! -L "$HOME/$legacy" ]; then

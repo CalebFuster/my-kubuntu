@@ -20,3 +20,4 @@ alias pip="pip3"
 alias countcodelines='find . -name "*.py" | grep -v "./(venv|build)/*" | xargs wc -l'
 alias countlines="find . -name '*.*' | xargs wc -l"
 alias reload='source ~/.bashrc'
+alias update='sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y'

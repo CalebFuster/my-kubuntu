@@ -16,3 +16,6 @@ unset -f _path_prepend
 
 # --- Embedded / firmware tooling ---
 [ -d "$HOME/.zephyr_sdk" ] && export ZEPHYR_SDK_INSTALL_DIR="$HOME/.zephyr_sdk/"
+
+# picocom line mapping used across the team (picocom $PICOMAP /dev/ttyUSB0)
+export PICOMAP="--imap lfcrlf --omap crcrlf,delbs"

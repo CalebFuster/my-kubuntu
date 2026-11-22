@@ -24,25 +24,26 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
   - **Drop `LC_ALL=C.UTF-8`** (and the `LANG=C.UTF-8` override). Let the desktop locale apply so KDE apps aren't broken.
 - Git config: the `merge-msg` hook uses config-based hooks (`[hook "…"]`), which Ubuntu 26.04's git 2.53 ignores. It stays in the config and activates with a newer git. Don't use `core.hooksPath` as a workaround: it would disable repos' own hooks.
 - **`local.sh` is never copied or committed.** The installer creates an empty `local.sh` template for machine-specific overrides. (The Mac's `local.sh` holds a secret token, so never copy it.)
-- Also ship: vimrc, tmux, readline, git config + `ignore`, Ghostty. Remove the Mac-only lines (e.g. `rtp+=/opt/homebrew/opt/fzf`). **No nvim config** (the neovim package stays).
+- Also ship: vimrc, tmux, readline, git config + `ignore`, Ghostty, kitty.
+- **Aligned with the lab Pis' config:** case-insensitive Tab completion, `update` alias (`apt update && upgrade -y && autoremove -y`), tmux status bar on top, tmux `&` kills a window without asking. Remove the Mac-only lines (e.g. `rtp+=/opt/homebrew/opt/fzf`). **No nvim config** (the neovim package stays).
 - **Everything follows XDG**: configs in `~/.config/<tool>/`, state/history in `~/.local/state/`, nothing new in `$HOME` (only exceptions: the one-line hook in `~/.bashrc`, `~/.ssh`, and `~/.venv/`). Legacy `~/.vimrc`, `~/.tmux.conf`, `~/.gitconfig`, `~/.inputrc` are moved aside because they would override the XDG versions.
 - Git: placeholder identity **`user <user@user.com>`**, written once to `~/.config/git/local` (included from the main config). It is never overwritten, so it can be changed per machine.
 - **Inbound SSH (remote access to the laptop):** `openssh-server`, key-only login, no root login (drop-in `/etc/ssh/sshd_config.d/10-linux-setup.conf`). Allowed keys live in `ssh/authorized_keys` (public keys only, with a comment saying whose key it is). The installer **adds** missing keys and never removes existing ones. Password login is only disabled once at least one key is in place.
-- Outgoing SSH: keys are **copied in manually**.
+- Outgoing SSH: keys are **copied in manually**. The installer should only create `~/.ssh` with correct permissions and a base `config` with `Include config.d/*` (**TODO**: not built yet).
 - **RDP:** KDE's built-in **KRdp** server (`krdp`, 6.6.4 on 26.04) on port 3389, started with the Plasma session. Login uses the account's normal password (`SystemUserEnabled`). The TLS certificate is **generated on each machine** (`~/.local/share/krdpserver/`) and never copied.
-- **Not adopted from the laptop** (personal): keyboard-clock sync service, VIA, keyboard layouts, power settings, VS Code settings, Remmina. The installer only creates `~/.ssh` with correct permissions and a base `config` with `Include config.d/*`.
+- **Not adopted from the laptop** (personal): keyboard-clock sync service, VIA, keyboard layouts, power settings, VS Code settings, Remmina.
 
 ## 3. Software
 
 ### Repos to add
 | Repo | For | arm64 | Notes |
 |---|---|---|---|
-| deadsnakes PPA | Python versions | yes | Recent reports say it publishes 26.04 (`resolute`) packages, but this is not confirmed. Verify with `apt policy` after adding. |
-| Vivaldi official apt | Vivaldi | yes | |
-| Waterfox official apt | Waterfox | yes (claimed) | Waterfox 6.7 announced official deb repos for x86_64+ARM64. **Verify the URL/key and whether it's stable or beta.** The old OBS (hawkeye116477) repo is unmaintained, so don't use it. Flatpak is the fallback. |
+| deadsnakes PPA | Python versions | yes | Verified: publishes 26.04 (`resolute`) packages. |
+| Vivaldi official apt | Vivaldi | yes | Added **only for the first install**: the `vivaldi-stable` package then replaces the repo file with its own and keeps it current (daily cron), so the installer leaves it alone afterwards. |
+| Waterfox official apt | Waterfox | yes | Official BrowserWorks repo on openSUSE OBS, `isv:BrowserWorks/xUbuntu_26.04` (flat repo). Stable since 6.7 (6.7.8 at time of writing). Not the old unmaintained hawkeye116477 repo. |
 | Docker official apt | Docker Engine | yes | |
-| Microsoft apt | VS Code | yes | |
-| Internal company apt | SEGGER J-Link (+ future internal pkgs) | TBD | Office/VPN only. URL + key TBD. |
+| Microsoft apt | VS Code | yes | The `code` package leaves our repo file alone. |
+| Quantica apt (`http://10.13.10.6/q3d-ppa-pi`, key `q3d-ppa-pi.asc`) | SEGGER J-Link | ? | From `fw_scripts/raspberry_pi/setup_pi.sh`. Office network/VPN only, plain HTTP. Built for the Raspberry Pis: **unverified** whether it has a `resolute` suite or amd64 builds. Only added when it serves `jlink` for this machine's release+arch, so it can't break `apt update`. |
 
 ### Packages
 - **Base CLI:** curl, wget, git, vim, neovim, tmux, htop, unzip, zoxide, fzf, bash-completion, ca-certificates.
@@ -53,9 +54,10 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **Rust:** rustup (`--no-modify-path`, default profile) with `CARGO_HOME`/`RUSTUP_HOME` under XDG. `$CARGO_HOME/bin` is added to PATH by `exports`.
 - **Docker:** Docker Engine + buildx + compose plugins from Docker's apt repo (has 26.04 amd64/arm64). `DOCKER_CONFIG` under XDG. Add the shared user to the `docker` group.
 - **Serial / embedded:** picocom, minicom, screen. Add the user to the `dialout` group.
-- **SEGGER J-Link:** from the internal apt repo.
+- **SEGGER J-Link:** from the Quantica repo when it serves `jlink` for this Ubuntu release + arch. Otherwise it's skipped with a warning. **Opt-in** fallback: `JLINK_FROM_SEGGER=1 sh install.sh --only jlink` downloads the official `.deb` from segger.com, accepting SEGGER's license (same as `install_jlink_pi.sh`); `JLINK_VERSION=Vxxx` pins a version.
+- **Team lab tools** (copied from `fw_scripts`, same as on the lab Pis): `serial_logger.sh`, `psu_direct.py`, `psu_remote.py` (Korad KA3010P PSU) in `~/.local/bin`, plus `python3-serial`. `PICOMAP` exported for `picocom $PICOMAP`.
 - **STM32 tools:** **out of scope for now.**
-- **Editors:** VS Code (extensions TBD), Neovim (no custom config), Vim.
+- **Editors:** VS Code (`code`, Microsoft repo; no settings shipped; extensions TBD), Neovim (no custom config), Vim.
 - **Terminal:** **Ghostty** from Ubuntu universe (1.3.0 on 26.04), plus `fonts-jetbrains-mono`. Set as the KDE default terminal (`kdeglobals` → `TerminalApplication`/`TerminalService`). Config merges the laptop's (no decoration, 0.80 opacity, copy-on-select) and the Mac's (window size, blur). Drop-down toggle on **Alt+Shift+A** via `~/.local/bin/toggle-ghostty.sh` (KWin script); its `.desktop` entries are rendered per machine because `Exec=` can't expand `$HOME`.
 - **Browsers:** Waterfox (Gecko, AI features off) and Vivaldi (Chromium). Both get **configured**, not just installed (see below).
 - **KDE:** see *KDE desktop* below.
@@ -72,10 +74,10 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - `*.knsv` files are gitignored: the laptop export is 1.1 GB (mostly ~2.8 GB of unused icon themes).
 
 ### Browser configuration
-- Use system-wide **enterprise policies** so the settings apply to everyone on the shared account and survive profile resets.
-- Waterfox: `policies.json` in the install's `distribution/` folder (exact path depends on the package). Disable AI/ML features, telemetry, sponsored content.
-- Vivaldi: Chromium-style managed policy JSON. The path Vivaldi reads is **unverified** (forum reports point to `/etc/chromium/policies/managed/`). Confirm with `vivaldi://policy`.
-- Policy contents (homepage, search engine, extensions, AI toggles) TBD.
+- Use system-wide **enterprise policies** so the settings apply to everyone on the shared account and survive profile resets. Files live in `browsers/`; `modules/88-browsers.sh` installs them.
+- **Waterfox** → `/etc/waterfox/policies/policies.json`. **Verified loaded** (headless `about:policies`). Baseline: **all AI blocked and locked** (`AIControls.Default=blocked`, which also blocks on-device translation, plus `GenerativeAI` off), Visual Search off, telemetry and studies off, sponsored tiles/stories/suggestions off, Mozilla promos and onboarding off. (`DisablePocket` was dropped: Waterfox ignores it, and `FirefoxHome` already hides Pocket.)
+- **Vivaldi** → `/etc/vivaldi/policies/managed/linux-setup.json`. The path is confirmed (hard-coded in the Vivaldi binary); the forum guess `/etc/chromium/...` was wrong. Loading is **not yet verified** (headless Vivaldi doesn't render internal pages): check `vivaldi://policy` on a real machine. Baseline is minimal, since Vivaldi ships no generative AI: no on-device AI model download, no metrics, no promotions.
+- Still TBD: homepage, search engine, extensions, default browser, removing snap Firefox.
 
 ## 4. System tweaks
 - Remove bloat: preinstalled apps list TBD (Kubuntu defaults to review).
@@ -84,7 +86,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 
 ## 5. Open questions
 1. SSH keys on a shared account: one shared key, or does each peer use an agent/forwarded key?
-2. Internal apt repo: URL, signing-key location, suite/component, arm64 availability.
+2. Quantica apt repo: does it serve a `resolute` suite and amd64? (Check on the office network: `curl http://10.13.10.6/q3d-ppa-pi/dists/`.)
 3. Full list of extra tools (picocom is in; what else?) and VS Code extensions.
 4. Browser policy contents for each browser.
 5. Bloat list and system-tweak specifics.

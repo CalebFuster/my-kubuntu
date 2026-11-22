@@ -2,3 +2,4 @@
 picocom
 minicom
 screen
+python3-serial   # PSU scripts (psu_direct.py / psu_remote.py)

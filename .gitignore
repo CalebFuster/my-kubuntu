@@ -5,3 +5,6 @@ local*.sh
 
 # konsave exports are huge (themes/icons) — never commit them.
 *.knsv
+
+# Reference copy of a machine's ~/.config (may contain secrets) — never commit.
+/.config/

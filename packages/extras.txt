@@ -1,0 +1,3 @@
+# Extra tools
+kitty      # second terminal (config in dotfiles; not autostarted)
+lazygit    # git TUI

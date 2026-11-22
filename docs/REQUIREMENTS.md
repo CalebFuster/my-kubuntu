@@ -28,7 +28,9 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **Everything follows XDG**: configs in `~/.config/<tool>/`, state/history in `~/.local/state/`, nothing new in `$HOME` (only exceptions: the one-line hook in `~/.bashrc`, `~/.ssh`, and `~/.venv/`). Legacy `~/.vimrc`, `~/.tmux.conf`, `~/.gitconfig`, `~/.inputrc` are moved aside because they would override the XDG versions.
 - Git: placeholder identity **`user <user@user.com>`**, written once to `~/.config/git/local` (included from the main config). It is never overwritten, so it can be changed per machine.
 - **Inbound SSH (remote access to the laptop):** `openssh-server`, key-only login, no root login (drop-in `/etc/ssh/sshd_config.d/10-linux-setup.conf`). Allowed keys live in `ssh/authorized_keys` (public keys only, with a comment saying whose key it is). The installer **adds** missing keys and never removes existing ones. Password login is only disabled once at least one key is in place.
-- Outgoing SSH: keys are **copied in manually**. The installer only creates `~/.ssh` with correct permissions and a base `config` with `Include config.d/*`.
+- Outgoing SSH: keys are **copied in manually**.
+- **RDP:** KDE's built-in **KRdp** server (`krdp`, 6.6.4 on 26.04) on port 3389, started with the Plasma session. Login uses the account's normal password (`SystemUserEnabled`). The TLS certificate is **generated on each machine** (`~/.local/share/krdpserver/`) and never copied.
+- **Not adopted from the laptop** (personal): keyboard-clock sync service, VIA, keyboard layouts, power settings, VS Code settings, Remmina. The installer only creates `~/.ssh` with correct permissions and a base `config` with `Include config.d/*`.
 
 ## 3. Software
 
@@ -57,6 +59,8 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **Terminal:** **Ghostty** from Ubuntu universe (1.3.0 on 26.04), plus `fonts-jetbrains-mono`. Set as the KDE default terminal (`kdeglobals` → `TerminalApplication`/`TerminalService`). Config merges the laptop's (no decoration, 0.80 opacity, copy-on-select) and the Mac's (window size, blur). Drop-down toggle on **Alt+Shift+A** via `~/.local/bin/toggle-ghostty.sh` (KWin script); its `.desktop` entries are rendered per machine because `Exec=` can't expand `$HOME`.
 - **Browsers:** Waterfox (Gecko, AI features off) and Vivaldi (Chromium). Both get **configured**, not just installed (see below).
 - **KDE:** see *KDE desktop* below.
+- **Extras:** kitty (second terminal, laptop config with Catppuccin-Mocha theme, **not** autostarted), lazygit (apt).
+- **OpenLogi** (Logitech HID++ mouse settings, [AprilNEA/OpenLogi](https://github.com/AprilNEA/OpenLogi)): not in any apt repo, so the pinned release `.deb` (**v0.9.0**, stable) is installed after a SHA-256 check. The agent starts with the graphical session.
 - **Others:** list TBD (e.g. more hardware/debug tools).
 
 ### KDE desktop

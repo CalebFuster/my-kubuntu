@@ -1,2 +1,4 @@
 # KDE theming: Kvantum engine for the WhiteSur widget style (kdeglobals: kvantum-dark)
 qt6-style-kvantum
+krdp
+openssl

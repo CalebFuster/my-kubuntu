@@ -64,6 +64,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **KDE:** see *KDE desktop* below.
 - **Extras:** kitty (second terminal, laptop config with Catppuccin-Mocha theme, **not** autostarted), lazygit (apt).
 - **OpenLogi** (Logitech HID++ mouse settings, [AprilNEA/OpenLogi](https://github.com/AprilNEA/OpenLogi)): not in any apt repo, so the pinned release `.deb` (**v0.9.0**, stable) is installed after a SHA-256 check. The agent starts with the graphical session.
+- **herdr** (terminal multiplexer for AI coding agents, [ogulcancelik/herdr](https://github.com/ogulcancelik/herdr)): not in any apt repo, so the pinned release binary (**v0.9.5**) goes to `~/.local/bin` after a SHA-256 check.
 - **Others:** list TBD (e.g. more hardware/debug tools).
 
 ### KDE desktop

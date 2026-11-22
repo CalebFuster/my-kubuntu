@@ -138,19 +138,22 @@ ensure_block() {
 }
 
 # ---------- apt repositories ----------
-# apt_add_repo NAME KEY_URL URIS SUITES COMPONENTS
+# apt_add_repo NAME KEY_URL URIS SUITES [COMPONENTS]
 #   Writes /etc/apt/keyrings/NAME.asc and /etc/apt/sources.list.d/NAME.sources
-#   (deb822 format, limited to this machine's arch). Sets REPOS_CHANGED=1 when
-#   something changed, so the caller can run pkg_update once at the end.
+#   (deb822 format, limited to this machine's arch). For a flat repo (e.g. OBS),
+#   pass SUITES="/" and no COMPONENTS. Sets REPOS_CHANGED=1 when something
+#   changed, so the caller can run pkg_update once at the end.
 apt_add_repo() {
-    local name="$1" key_url="$2" uris="$3" suites="$4" components="$5"
+    local name="$1" key_url="$2" uris="$3" suites="$4" components="${5:-}"
     local key="/etc/apt/keyrings/$name.asc"
     local list="/etc/apt/sources.list.d/$name.sources"
     local content
     content="Types: deb
 URIs: $uris
-Suites: $suites
-Components: $components
+Suites: $suites"
+    [ -n "$components" ] && content="$content
+Components: $components"
+    content="$content
 Architectures: $ARCH
 Signed-By: $key"
 

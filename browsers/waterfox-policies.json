@@ -1,0 +1,36 @@
+{
+  "policies": {
+    "AIControls": {
+      "Default": { "Value": "blocked", "Locked": true }
+    },
+    "GenerativeAI": {
+      "Enabled": false,
+      "Chatbot": false,
+      "SmartWindow": false,
+      "LinkPreviews": false,
+      "TabGroups": false,
+      "Locked": true
+    },
+    "VisualSearchEnabled": false,
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "FirefoxHome": {
+      "SponsoredTopSites": false,
+      "SponsoredPocket": false,
+      "SponsoredStories": false,
+      "Pocket": false,
+      "Stories": false
+    },
+    "FirefoxSuggest": {
+      "SponsoredSuggestions": false,
+      "ImproveSuggest": false,
+      "Locked": true
+    },
+    "UserMessaging": {
+      "MoreFromMozilla": false,
+      "FeatureRecommendations": false,
+      "ExtensionRecommendations": false,
+      "SkipOnboarding": true
+    }
+  }
+}

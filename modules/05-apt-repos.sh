@@ -20,6 +20,30 @@ apt_add_repo docker \
     https://download.docker.com/linux/ubuntu \
     "$OS_CODENAME" stable
 
+# VS Code (Microsoft). The package leaves this file alone.
+apt_add_repo vscode \
+    https://packages.microsoft.com/keys/microsoft.asc \
+    https://packages.microsoft.com/repos/code \
+    stable main
+
+# Waterfox (official BrowserWorks repo on openSUSE OBS; flat repo).
+apt_add_repo waterfox \
+    https://download.opensuse.org/repositories/isv:/BrowserWorks/xUbuntu_26.04/Release.key \
+    https://download.opensuse.org/repositories/isv:/BrowserWorks/xUbuntu_26.04/ \
+    /
+
+# Vivaldi: only to bootstrap the first install. The vivaldi-stable package
+# then replaces this file with its own and keeps it updated (daily cron job),
+# so re-adding it afterwards would just fight the package.
+if dpkg-query -W -f='${Status}' vivaldi-stable 2>/dev/null | grep -q "install ok installed"; then
+    info "repo vivaldi managed by the vivaldi-stable package"
+else
+    apt_add_repo vivaldi \
+        https://repo.vivaldi.com/stable/linux_signing_key.pub \
+        https://repo.vivaldi.com/stable/deb/ \
+        stable main
+fi
+
 if [ "$REPOS_CHANGED" -eq 1 ]; then
     pkg_update
 fi

@@ -21,3 +21,23 @@ install_policy() {
 
 install_policy "$ROOT_DIR/browsers/waterfox-policies.json" /etc/waterfox/policies/policies.json
 install_policy "$ROOT_DIR/browsers/vivaldi-policies.json"  /etc/vivaldi/policies/managed/linux-setup.json
+
+# --- Vivaldi as default browser ---
+BROWSER_DESKTOP="vivaldi-stable.desktop"
+if [ "${DRY_RUN:-0}" -eq 0 ] && [ ! -f "/usr/share/applications/$BROWSER_DESKTOP" ]; then
+    warn "Vivaldi not installed; default browser not changed."
+else
+    # Per user: links and HTML files (writes ~/.config/mimeapps.list).
+    for mime in x-scheme-handler/http x-scheme-handler/https text/html application/xhtml+xml; do
+        run xdg-mime default "$BROWSER_DESKTOP" "$mime"
+    done
+    # KDE's own "default web browser" setting.
+    if has kwriteconfig6; then
+        run kwriteconfig6 --file kdeglobals --group General --key BrowserApplication "$BROWSER_DESKTOP"
+    fi
+    # System-wide x-www-browser (used by some CLI tools).
+    if update-alternatives --list x-www-browser 2>/dev/null | grep -qx /usr/bin/vivaldi-stable; then
+        run $SUDO update-alternatives --set x-www-browser /usr/bin/vivaldi-stable >/dev/null
+    fi
+    ok "Vivaldi is the default browser"
+fi

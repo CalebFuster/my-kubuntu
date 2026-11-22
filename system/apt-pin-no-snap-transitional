@@ -1,0 +1,6 @@
+# Installed by Linux-Setup (modules/90-debloat.sh) to /etc/apt/preferences.d/no-snap-transitional
+# Never install Ubuntu's Firefox/Thunderbird: they are transitional .debs that
+# pull the snaps back in. Waterfox and Vivaldi are the browsers here.
+Package: firefox* thunderbird*
+Pin: release o=Ubuntu*
+Pin-Priority: -1

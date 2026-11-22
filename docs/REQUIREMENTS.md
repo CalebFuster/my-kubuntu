@@ -29,7 +29,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **Everything follows XDG**: configs in `~/.config/<tool>/`, state/history in `~/.local/state/`, nothing new in `$HOME` (only exceptions: the one-line hook in `~/.bashrc`, `~/.ssh`, and `~/.venv/`). Legacy `~/.vimrc`, `~/.tmux.conf`, `~/.gitconfig`, `~/.inputrc` are moved aside because they would override the XDG versions.
 - Git: placeholder identity **`user <user@user.com>`**, written once to `~/.config/git/local` (included from the main config). It is never overwritten, so it can be changed per machine.
 - **Inbound SSH (remote access to the laptop):** `openssh-server`, key-only login, no root login (drop-in `/etc/ssh/sshd_config.d/10-linux-setup.conf`). Allowed keys live in `ssh/authorized_keys` (public keys only, with a comment saying whose key it is). The installer **adds** missing keys and never removes existing ones. Password login is only disabled once at least one key is in place.
-- Outgoing SSH: keys are **copied in manually**. The installer should only create `~/.ssh` with correct permissions and a base `config` with `Include config.d/*` (**TODO**: not built yet).
+- Outgoing SSH: keys are **copied in manually**. The installer creates `~/.ssh` and `~/.ssh/config.d/` (700) and makes `Include config.d/*` the **first** line of `~/.ssh/config`. It creates the file if missing; otherwise it prepends the line and keeps a backup.
 - **RDP:** KDE's built-in **KRdp** server (`krdp`, 6.6.4 on 26.04) on port 3389, started with the Plasma session. Login uses the account's normal password (`SystemUserEnabled`). The TLS certificate is **generated on each machine** (`~/.local/share/krdpserver/`) and never copied.
 - **Not adopted from the laptop** (personal): keyboard-clock sync service, VIA, keyboard layouts, power settings, VS Code settings, Remmina.
 
@@ -77,12 +77,13 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - Use system-wide **enterprise policies** so the settings apply to everyone on the shared account and survive profile resets. Files live in `browsers/`; `modules/88-browsers.sh` installs them.
 - **Waterfox** → `/etc/waterfox/policies/policies.json`. **Verified loaded** (headless `about:policies`). Baseline: **all AI blocked and locked** (`AIControls.Default=blocked`, which also blocks on-device translation, plus `GenerativeAI` off), Visual Search off, telemetry and studies off, sponsored tiles/stories/suggestions off, Mozilla promos and onboarding off. (`DisablePocket` was dropped: Waterfox ignores it, and `FirefoxHome` already hides Pocket.)
 - **Vivaldi** → `/etc/vivaldi/policies/managed/linux-setup.json`. The path is confirmed (hard-coded in the Vivaldi binary); the forum guess `/etc/chromium/...` was wrong. Loading is **not yet verified** (headless Vivaldi doesn't render internal pages): check `vivaldi://policy` on a real machine. Baseline is minimal, since Vivaldi ships no generative AI: no on-device AI model download, no metrics, no promotions.
-- Still TBD: homepage, search engine, extensions, default browser, removing snap Firefox.
+- **Default browser: Vivaldi**: links/HTML via `mimeapps.list`, KDE's `BrowserApplication`, and `x-www-browser`. The taskbar's pinned Firefox was replaced with `preferred://browser`.
+- Homepage, search engine, extensions: **left as is** (no extra policies).
 
 ## 4. System tweaks
-- Remove bloat: preinstalled apps list TBD (Kubuntu defaults to review).
-- Firewall (ufw: limit SSH/RDP to the office network?), swap, unattended-upgrades, hostname, locale/timezone: specifics TBD.
-- Snap Firefox: remove? (Waterfox replaces it.) TBD.
+- **Remove bloat** (`modules/90-debloat.sh`, editable lists): Firefox and Thunderbird snaps plus their transitional `.deb`s, Konsole (Ghostty replaces it), games (kmahjongg, kmines, kpat, ksudoku), neochat, plasma-welcome, usb-creator-kde, khelpcenter, and the media players elisa and haruna (so audio/video files have no default player). Verified on the laptop with `apt-get -s purge` that only these 11 packages go and `kubuntu-desktop` stays. Snapd is kept. An apt pin (`/etc/apt/preferences.d/no-snap-transitional`) stops Ubuntu's firefox/thunderbird from coming back; both are only *Recommends* of `kubuntu-desktop`, so the metapackage stays.
+- **Firewall: none** (ufw stays off, Kubuntu default). SSH is key-only; RDP uses the account password and is reachable on any network the laptop joins.
+- Swap, unattended-upgrades, hostname, locale/timezone: specifics TBD.
 
 ## 5. Open questions
 1. SSH keys on a shared account: one shared key, or does each peer use an agent/forwarded key?

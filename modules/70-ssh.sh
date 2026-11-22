@@ -12,6 +12,33 @@ AUTH="$HOME/.ssh/authorized_keys"
 
 pkg_install openssh-server
 
+# --- Client side: ~/.ssh/config includes ~/.ssh/config.d/* (one file per site) ---
+SSH_CFG="$HOME/.ssh/config"
+INCLUDE_LINE="Include config.d/*"
+run install -d -m 700 "$HOME/.ssh" "$HOME/.ssh/config.d"
+if [ ! -f "$SSH_CFG" ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        printf '    + create %s with "%s"\n' "$SSH_CFG" "$INCLUDE_LINE"
+    else
+        printf '# Per-host settings live in ~/.ssh/config.d/*.conf (e.g. one file per site).\n%s\n' \
+            "$INCLUDE_LINE" > "$SSH_CFG"
+        chmod 600 "$SSH_CFG"
+        ok "created $SSH_CFG"
+    fi
+elif ! grep -qxF "$INCLUDE_LINE" "$SSH_CFG"; then
+    # Must come first so it applies to every host, not just the last Host block.
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        printf '    + prepend "%s" to %s\n' "$INCLUDE_LINE" "$SSH_CFG"
+    else
+        cp "$SSH_CFG" "$SSH_CFG.bak.$(date +%Y%m%d%H%M%S)"
+        tmp="$(mktemp)"
+        { printf '%s\n\n' "$INCLUDE_LINE"; cat "$SSH_CFG"; } > "$tmp"
+        mv "$tmp" "$SSH_CFG"
+        chmod 600 "$SSH_CFG"
+        ok "added '$INCLUDE_LINE' to the top of $SSH_CFG (backup kept)"
+    fi
+fi
+
 run install -d -m 700 "$HOME/.ssh"
 run touch "$AUTH"
 run chmod 600 "$AUTH"

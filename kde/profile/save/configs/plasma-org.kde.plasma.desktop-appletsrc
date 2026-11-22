@@ -159,7 +159,7 @@ DialogHeight=630
 DialogWidth=810
 
 [Containments][287][Applets][294][Configuration][General]
-launchers=preferred://filemanager,applications:com.mitchellh.ghostty.desktop,applications:firefox_firefox.desktop
+launchers=preferred://filemanager,applications:com.mitchellh.ghostty.desktop,preferred://browser
 
 [Containments][287][General]
 AppletOrder=294

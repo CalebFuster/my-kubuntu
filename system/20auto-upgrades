@@ -1,0 +1,4 @@
+// Installed by Linux-Setup (modules/92-system.sh). Ubuntu default:
+// refresh package lists daily and install security updates automatically.
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";

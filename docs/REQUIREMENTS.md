@@ -83,12 +83,21 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 ## 4. System tweaks
 - **Remove bloat** (`modules/90-debloat.sh`, editable lists): Firefox and Thunderbird snaps plus their transitional `.deb`s, Konsole (Ghostty replaces it), games (kmahjongg, kmines, kpat, ksudoku), neochat, plasma-welcome, usb-creator-kde, khelpcenter, and the media players elisa and haruna (so audio/video files have no default player). Verified on the laptop with `apt-get -s purge` that only these 11 packages go and `kubuntu-desktop` stays. Snapd is kept. An apt pin (`/etc/apt/preferences.d/no-snap-transitional`) stops Ubuntu's firefox/thunderbird from coming back; both are only *Recommends* of `kubuntu-desktop`, so the metapackage stays.
 - **Firewall: none** (ufw stays off, Kubuntu default). SSH is key-only; RDP uses the account password and is reachable on any network the laptop joins.
-- Swap, unattended-upgrades, hostname, locale/timezone: specifics TBD.
+- **Swap: zram + existing swapfile.** `systemd-zram-generator` makes a compressed swap in RAM (half of RAM, zstd, priority 100), used before the installer's disk swapfile (kept as overflow).
+- **Automatic updates: security only** (Ubuntu default, enforced via `/etc/apt/apt.conf.d/20auto-upgrades`). Everything else is updated with the `update` alias or Discover.
+- **Hostname: asked at the start of the install**, with the current name as default (Enter keeps it). `-y` keeps the current name; `HOSTNAME_NEW=name` sets it without a prompt. Validated (a-z, 0-9, `-`), and `/etc/hosts` is kept in sync.
+- **Locale, keyboard, timezone: left as chosen in the Kubuntu installer** (peers in Berlin and Barcelona differ). Only NTP time sync is turned on.
 
 ## 5. Open questions
 1. SSH keys on a shared account: one shared key, or does each peer use an agent/forwarded key?
 2. Quantica apt repo: does it serve a `resolute` suite and amd64? (Check on the office network: `curl http://10.13.10.6/q3d-ppa-pi/dists/`.)
-3. Full list of extra tools (picocom is in; what else?) and VS Code extensions.
-4. Browser policy contents for each browser.
-5. Bloat list and system-tweak specifics.
-6. Should `shell_config` changes flow back to the Mac copy, or is this a fork from now on?
+3. More tools to add over time (VS Code extensions and browser policies are intentionally left as is for now).
+4. Should `shell_config` changes flow back to the Mac copy, or is this a fork from now on?
+
+## 6. Still to verify on a real machine
+- J-Link from the Quantica repo (needs office network).
+- Vivaldi policies load (`vivaldi://policy`).
+- KDE look after login (run `konsave -s before-linux-setup` first on a machine you care about).
+- RDP connection (port 3389) and OpenLogi with a real mouse.
+- Snap removal of Firefox/Thunderbird; zram active (`swapon --show`); hostname change.
+- amd64: Node via nvm (the emulator here can't unpack Node's tarball).

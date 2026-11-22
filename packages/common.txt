@@ -1,0 +1,9 @@
+# Packages with the same name on every distro. One per line, # for comments.
+curl
+wget
+git
+vim
+htop
+tmux
+unzip
+ca-certificates

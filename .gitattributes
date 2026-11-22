@@ -1,0 +1,4 @@
+# Keep LF endings so scripts run on Linux even if edited elsewhere.
+*.sh text eol=lf
+*.txt text eol=lf
+dotfiles/** text eol=lf

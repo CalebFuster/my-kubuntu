@@ -1,0 +1,4 @@
+# Fedora / RHEL specific
+gcc
+make
+openssh-clients

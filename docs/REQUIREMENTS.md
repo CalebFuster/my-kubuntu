@@ -7,7 +7,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 | Topic | Decision |
 |---|---|
 | Distro | **Kubuntu 26.04 LTS** only (Ubuntu base, apt). No dnf/pacman/zypper support needed. |
-| Desktop | KDE Plasma. Desktop/UI state is captured and restored with **konsave** (installed via `pipx`; system pip is blocked by PEP 668). |
+| Desktop | KDE Plasma. Desktop/UI state is captured and restored with **konsave** (installed with `uv tool` into `~/.venv/konsave`; system pip is blocked by PEP 668). |
 | Architectures | **amd64 and arm64.** Every third-party source must be checked for arm64; if missing, the step is skipped with a warning, never a failure. |
 | Run context | Run by a normal user with sudo: `sh install.sh`. Must be re-runnable (idempotent). |
 | Users | **One shared account** used by several peers. All configs must be neutral: no personal identity, tokens, or machine-specific paths. |
@@ -25,7 +25,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - Git config: the `merge-msg` hook uses config-based hooks (`[hook "…"]`), which Ubuntu 26.04's git 2.53 ignores. It stays in the config and activates with a newer git. Don't use `core.hooksPath` as a workaround: it would disable repos' own hooks.
 - **`local.sh` is never copied or committed.** The installer creates an empty `local.sh` template for machine-specific overrides. (The Mac's `local.sh` holds a secret token, so never copy it.)
 - Also ship: vimrc, tmux, readline, git config + `ignore`, Ghostty. Remove the Mac-only lines (e.g. `rtp+=/opt/homebrew/opt/fzf`). **No nvim config** (the neovim package stays).
-- **Everything follows XDG**: configs in `~/.config/<tool>/`, state/history in `~/.local/state/`, nothing new in `$HOME` (only exceptions: the one-line hook in `~/.bashrc`, and `~/.ssh`). Legacy `~/.vimrc`, `~/.tmux.conf`, `~/.gitconfig`, `~/.inputrc` are moved aside because they would override the XDG versions.
+- **Everything follows XDG**: configs in `~/.config/<tool>/`, state/history in `~/.local/state/`, nothing new in `$HOME` (only exceptions: the one-line hook in `~/.bashrc`, `~/.ssh`, and `~/.venv/`). Legacy `~/.vimrc`, `~/.tmux.conf`, `~/.gitconfig`, `~/.inputrc` are moved aside because they would override the XDG versions.
 - Git: placeholder identity **`user <user@user.com>`**, written once to `~/.config/git/local` (included from the main config). It is never overwritten, so it can be changed per machine.
 - SSH: keys are **copied in manually**. The installer only creates `~/.ssh` with correct permissions and a base `config` with `Include config.d/*`.
 
@@ -44,7 +44,8 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 ### Packages
 - **Base CLI:** curl, wget, git, vim, neovim, tmux, htop, unzip, zoxide, fzf, bash-completion, ca-certificates.
 - **C/C++:** build-essential, cmake, ninja-build, gdb, clang, clang-format, clang-tidy, doxygen.
-- **Python:** deadsnakes versions (list TBD), `pipx`, `uv`. **uv must only use system (deadsnakes) Pythons**: `UV_PYTHON_PREFERENCE=only-system`, `UV_PYTHON_DOWNLOADS=never`.
+- **Python:** deadsnakes versions (list TBD) + `uv` (official installer, as uv isn't in Ubuntu's repos). **uv must only use system (deadsnakes) Pythons**: `UV_PYTHON_PREFERENCE=only-system`, `UV_PYTHON_DOWNLOADS=never`. No pipx: `uv tool install` replaces it.
+- **Venvs live in `~/.venv/<name>`** (one per tool/project, same as the Mac). This is a deliberate exception to the XDG rule. `UV_TOOL_DIR=~/.venv`, so `uv tool install konsave` → `~/.venv/konsave`, with the command linked into `~/.local/bin`. Shell helpers: `mkvenv NAME [PYVER]` and `venv NAME` (tab-completes).
 - **Node:** nvm, installed into `$XDG_DATA_HOME/nvm` (matches the `xdg` file). Default Node version TBD.
 - **Rust:** rustup with `CARGO_HOME`/`RUSTUP_HOME` under XDG (matches the `xdg` file).
 - **Docker:** Docker Engine + compose plugin. Add the shared user to the `docker` group.
@@ -54,7 +55,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **Editors:** VS Code (extensions TBD), Neovim (no custom config), Vim.
 - **Terminal:** **Ghostty** from Ubuntu universe (1.3.0 on 26.04), plus `fonts-jetbrains-mono`. Set as the KDE default terminal (`kdeglobals` → `TerminalApplication`/`TerminalService`).
 - **Browsers:** Waterfox (Gecko, AI features off) and Vivaldi (Chromium). Both get **configured**, not just installed (see below).
-- **KDE:** konsave (via pipx) + a saved profile in the repo.
+- **KDE:** konsave (via `uv tool`) + a saved profile in the repo.
 - **Others:** list TBD (e.g. more hardware/debug tools).
 
 ### Browser configuration

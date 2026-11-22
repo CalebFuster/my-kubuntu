@@ -32,3 +32,10 @@ export PLATFORMIO_CORE_DIR="$XDG_DATA_HOME/platformio"
 
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
 alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts"'
+
+# Python venvs: one per tool/project in ~/.venv/<name> (deliberate non-XDG
+# exception, same layout as the Mac). uv only uses system/deadsnakes Pythons.
+export VENV_HOME="$HOME/.venv"
+export UV_TOOL_DIR="$VENV_HOME"          # uv tool install X -> ~/.venv/X
+export UV_PYTHON_PREFERENCE=only-system
+export UV_PYTHON_DOWNLOADS=never

@@ -47,3 +47,10 @@ complete -F _ssh_config_hosts ssh
 # zoxide (smarter cd)
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
 
+
+# Tab-complete venv names for `venv`
+_venv_names() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    COMPREPLY=( $(compgen -W "$(ls "${VENV_HOME:-$HOME/.venv}" 2>/dev/null)" -- "$cur") )
+}
+complete -F _venv_names venv

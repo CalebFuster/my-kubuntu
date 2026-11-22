@@ -44,3 +44,18 @@ fi
 alias gitclean="_gitclean"
 alias pipclean="_pipclean"
 alias folderclean="_folderclean"
+
+# venv NAME: activate ~/.venv/NAME  (no NAME: list them)
+venv() {
+    if [ -z "$1" ]; then
+        ls "${VENV_HOME:-$HOME/.venv}"
+        return
+    fi
+    . "${VENV_HOME:-$HOME/.venv}/$1/bin/activate"
+}
+
+# mkvenv NAME [PYTHON]: create ~/.venv/NAME with uv, e.g. `mkvenv zephyr 3.12`
+mkvenv() {
+    [ -n "$1" ] || { echo "usage: mkvenv NAME [PYTHON_VERSION]"; return 1; }
+    uv venv "${VENV_HOME:-$HOME/.venv}/$1" ${2:+--python "$2"}
+}

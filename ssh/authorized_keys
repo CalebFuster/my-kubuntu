@@ -1,0 +1,4 @@
+# Public keys allowed to SSH into the shared account. One key per line;
+# keep the comment at the end so we know whose key it is.
+# PUBLIC keys only (*.pub). Never put a private key in this repo.
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE4eu2H117345CS7U95eRzHpon8a8c01hPTTla4VSeKp info@quantica3d.com

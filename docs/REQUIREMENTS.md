@@ -43,6 +43,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 | Waterfox official apt | Waterfox | yes | Official BrowserWorks repo on openSUSE OBS, `isv:BrowserWorks/xUbuntu_26.04` (flat repo). Stable since 6.7 (6.7.8 at time of writing). Not the old unmaintained hawkeye116477 repo. |
 | Docker official apt | Docker Engine | yes | |
 | Microsoft apt | VS Code | yes | The `code` package leaves our repo file alone. |
+| Sublime HQ apt | Sublime Text | yes | Official repo `download.sublimetext.com`, `apt/stable/` (flat repo). |
 | Quantica apt (`http://10.13.10.6/q3d-ppa-pi`, key `q3d-ppa-pi.asc`) | SEGGER J-Link | ? | From `fw_scripts/raspberry_pi/setup_pi.sh`. Office network/VPN only, plain HTTP. Built for the Raspberry Pis: **unverified** whether it has a `resolute` suite or amd64 builds. Only added when it serves `jlink` for this machine's release+arch, so it can't break `apt update`. |
 
 ### Packages
@@ -57,7 +58,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **SEGGER J-Link:** from the Quantica repo when it serves `jlink` for this Ubuntu release + arch. Otherwise it's skipped with a warning. **Opt-in** fallback: `JLINK_FROM_SEGGER=1 sh install.sh --only jlink` downloads the official `.deb` from segger.com, accepting SEGGER's license (same as `install_jlink_pi.sh`); `JLINK_VERSION=Vxxx` pins a version.
 - **Team lab tools** (copied from `fw_scripts`, same as on the lab Pis): `serial_logger.sh`, `psu_direct.py`, `psu_remote.py` (Korad KA3010P PSU) in `~/.local/bin`, plus `python3-serial`. `PICOMAP` exported for `picocom $PICOMAP`.
 - **STM32 tools:** **out of scope for now.**
-- **Editors:** VS Code (`code`, Microsoft repo; no settings shipped; extensions TBD), Neovim (no custom config), Vim.
+- **Editors:** VS Code (`code`, Microsoft repo; no settings shipped; extensions TBD), Sublime Text (`sublime-text`, Sublime HQ repo; no settings shipped), Neovim (no custom config), Vim.
 - **Terminal:** **Ghostty** from Ubuntu universe (1.3.0 on 26.04), plus `fonts-jetbrains-mono`. Set as the KDE default terminal (`kdeglobals` → `TerminalApplication`/`TerminalService`). Config merges the laptop's (no decoration, 0.80 opacity, copy-on-select) and the Mac's (window size, blur). Drop-down toggle on **Alt+Shift+A** via `~/.local/bin/toggle-ghostty.sh` (KWin script); its `.desktop` entries are rendered per machine because `Exec=` can't expand `$HOME`.
 - **Browsers:** Waterfox (Gecko, AI features off) and Vivaldi (Chromium). Both get **configured**, not just installed (see below).
 - **KDE:** see *KDE desktop* below.

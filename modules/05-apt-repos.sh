@@ -26,6 +26,12 @@ apt_add_repo vscode \
     https://packages.microsoft.com/repos/code \
     stable main
 
+# Sublime Text (official Sublime HQ repo; flat repo).
+apt_add_repo sublime-text \
+    https://download.sublimetext.com/sublimehq-pub.gpg \
+    https://download.sublimetext.com/ \
+    apt/stable/
+
 # Waterfox (official BrowserWorks repo on openSUSE OBS; flat repo).
 apt_add_repo waterfox \
     https://download.opensuse.org/repositories/isv:/BrowserWorks/xUbuntu_26.04/Release.key \

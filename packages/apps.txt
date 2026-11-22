@@ -1,4 +1,5 @@
 # Desktop apps from third-party repos (added in modules/05-apt-repos.sh)
 code             # VS Code (Microsoft repo)
+sublime-text     # Sublime Text (Sublime HQ repo)
 waterfox         # Gecko browser (BrowserWorks repo), policies in browsers/
 vivaldi-stable   # Chromium browser (Vivaldi repo), policies in browsers/

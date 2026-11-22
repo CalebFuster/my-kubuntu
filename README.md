@@ -18,8 +18,9 @@ sh install.sh --dry-run  # print what would run
 
 Copy example: `rsync -a --exclude .git Linux-Setup/ user@host:~/Linux-Setup/`
 
-Optional: put a konsave export (`*.knsv`) next to `install.sh` to also install the
-Apple-cursors theme from it. `*.knsv` files are gitignored, so never commit one.
+Optional: put `cursors.knsv` (1.5 MB, Apple-cursors only; any konsave export with that
+cursor works too) next to `install.sh` to install the Apple-cursors theme. Without it
+KDE's default cursor is used. `*.knsv` files are gitignored, so never commit one.
 
 Logs go to `~/.local/state/linux-setup/`.
 

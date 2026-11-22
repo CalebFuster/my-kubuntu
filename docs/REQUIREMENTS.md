@@ -71,12 +71,15 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **Settings:** konsave profile kept **unpacked** in `kde/profile/` (~300 KB, diffable), trimmed from the laptop's `Sequoia.knsv`. The installer zips, imports and applies it. Left out: monitor layout (`kwinoutputconfig.json`), region (`plasma-localerc`), KDE migration state (`kconf_updaterc`), theme files, Ghostty/tmux (from dotfiles). A personal home-folder wallpaper path was removed.
 - **Cursor:** `Apple-cursors` (manual download, unknown license) is **not committed**. It's extracted from a local `*.knsv` placed next to `install.sh` (or `KNSV=/path`). Without one, KDE's default cursor is used.
 - **Login screen:** SDDM theme WhiteSur-dark (system-wide, from the same WhiteSur-kde commit), **autologin disabled**, via `/etc/sddm.conf.d/zz-linux-setup.conf`. That file overrides System Settings' SDDM page, so edit it instead.
-- `*.knsv` files are gitignored: the laptop export is 1.1 GB (mostly ~2.8 GB of unused icon themes).
+- `*.knsv` files are gitignored: the laptop export is 1.1 GB (mostly ~2.8 GB of unused icon themes). Keep only `cursors.knsv` (1.5 MB, just Apple-cursors) next to `install.sh` and copy it along with the folder.
 
 ### Browser configuration
 - Use system-wide **enterprise policies** so the settings apply to everyone on the shared account and survive profile resets. Files live in `browsers/`; `modules/88-browsers.sh` installs them.
 - **Waterfox** → `/etc/waterfox/policies/policies.json`. **Verified loaded** (headless `about:policies`). Baseline: **all AI blocked and locked** (`AIControls.Default=blocked`, which also blocks on-device translation, plus `GenerativeAI` off), Visual Search off, telemetry and studies off, sponsored tiles/stories/suggestions off, Mozilla promos and onboarding off. (`DisablePocket` was dropped: Waterfox ignores it, and `FirefoxHome` already hides Pocket.)
 - **Vivaldi** → `/etc/vivaldi/policies/managed/linux-setup.json`. The path is confirmed (hard-coded in the Vivaldi binary); the forum guess `/etc/chromium/...` was wrong. Loading is **not yet verified** (headless Vivaldi doesn't render internal pages): check `vivaldi://policy` on a real machine. Baseline is minimal, since Vivaldi ships no generative AI: no on-device AI model download, no metrics, no promotions.
+- **Waterfox look: WhiteSur (macOS-style)**, the same theme as the laptop's Firefox (which konsave never captured). Theme files come from WhiteSur-gtk-theme @ `2026-09-10` (`other/firefox`, default variant) plus the laptop's `userChrome.css` (`browsers/waterfox-userChrome.css`: hides window buttons when maximized). They're built into `~/.local/share/linux-setup/waterfox-chrome`; every `~/.waterfox/*default*` profile gets `chrome` linked there, plus the prefs WhiteSur's installer sets in `user.js`. If no profile exists yet, Waterfox is run once headless to create it. (`~/.waterfox` is Waterfox's own path; it can't be moved to XDG.)
+- **Vivaldi look: native window frame** (`vivaldi.windows.use_native_decoration`), so KDE draws its WhiteSur-dark title bar with macOS-style buttons. Vivaldi can't use `userChrome.css` themes. It ignores `vivaldi.*` keys in `initial_preferences`, so the installer creates the profile (headless first run, retried without Chromium's sandbox where that can't start) and sets the key in `~/.config/vivaldi/Default/Preferences` while Vivaldi is closed. Re-running re-applies it.
+- Both are done by `modules/89-browser-theme.sh`.
 - **Default browser: Vivaldi**: links/HTML via `mimeapps.list`, KDE's `BrowserApplication`, and `x-www-browser`. The taskbar's pinned Firefox was replaced with `preferred://browser`.
 - Homepage, search engine, extensions: **left as is** (no extra policies).
 
@@ -97,6 +100,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 ## 6. Still to verify on a real machine
 - J-Link from the Quantica repo (needs office network).
 - Vivaldi policies load (`vivaldi://policy`).
+- Waterfox WhiteSur look and Vivaldi native frame (headless can't render the browser UI).
 - KDE look after login (run `konsave -s before-linux-setup` first on a machine you care about).
 - RDP connection (port 3389) and OpenLogi with a real mouse.
 - Snap removal of Firefox/Thunderbird; zram active (`swapon --show`); hostname change.

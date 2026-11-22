@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Ghostty
+GenericName=Terminal Emulator
+Comment=Ghostty Dropdown Terminal
+Exec=@HOME@/.local/bin/toggle-ghostty.sh
+Terminal=false
+Categories=System;TerminalEmulator;
+Icon=com.mitchellh.ghostty
+StartupWMClass=ghostty
+StartupNotify=false
+NoDisplay=false

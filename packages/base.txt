@@ -13,3 +13,4 @@ tmux
 htop
 fzf
 zoxide
+zip

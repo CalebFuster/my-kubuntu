@@ -18,6 +18,9 @@ sh install.sh --dry-run  # print what would run
 
 Copy example: `rsync -a --exclude .git Linux-Setup/ user@host:~/Linux-Setup/`
 
+Optional: put a konsave export (`*.knsv`) next to `install.sh` to also install the
+Apple-cursors theme from it. `*.knsv` files are gitignored, so never commit one.
+
 Logs go to `~/.local/state/linux-setup/`.
 
 ## Layout
@@ -28,6 +31,9 @@ lib/common.sh       helpers: logging, run (dry-run aware), pkg_install, install_
 modules/NN-name.sh  setup steps, run in numeric order (each in a subshell)
 packages/*.txt      apt packages, one per line; all files are installed
 dotfiles/           copied into $HOME at the same paths (differing files backed up)
+kde/profile/        konsave profile (unpacked); applied by modules/82-kde-profile.sh
+kde/applications/   .desktop templates (@HOME@ is filled in per machine)
+ssh/                authorized public keys + sshd hardening drop-in
 docs/               requirements and decisions
 ```
 

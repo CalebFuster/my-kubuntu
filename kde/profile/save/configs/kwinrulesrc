@@ -1,0 +1,16 @@
+[5d10c6ca-05f2-49db-8767-c0be08518055]
+Description=Ghostty
+aboverule=2
+maximizehoriz=true
+maximizehorizrule=2
+position=0,30
+positionrule=2
+size=1920,500
+sizerule=2
+wmclass=ghostty com.mitchellh.ghostty
+wmclasscomplete=true
+wmclassmatch=1
+
+[General]
+count=1
+rules=5d10c6ca-05f2-49db-8767-c0be08518055

@@ -1,17 +1,17 @@
+# Merged: laptop (Kubuntu-tuned look) + Mac (window size, blur).
+# Drop-down toggle: Alt+Shift+A runs ~/.local/bin/toggle-ghostty.sh (KWin script).
+
 # ─── Font & Appearance ────────────────────────────────────────────────────────
 font-family = "JetBrains Mono"
-font-size = 12
+font-size = 15
 theme = Dark+
+background-opacity = 0.80
+background-blur-radius = 20
 
 # ─── Window ───────────────────────────────────────────────────────────────────
 window-padding-x = 10
 window-padding-y = 10
-
-# Transparency + blur (blur works on KDE Plasma)
-background-opacity = 0.85
-background-blur-radius = 20
-
-# Start with a larger default window size (columns x rows)
+window-decoration = false
 window-width = 100
 window-height = 30
 
@@ -21,10 +21,4 @@ confirm-close-surface = false
 mouse-hide-while-typing = true
 scrollback-limit = 10000
 cursor-style = block
-
-# ─── Keybindings ──────────────────────────────────────────────────────────────
-# Global shortcut via the desktop portal (KDE asks once to allow it)
-keybind = global:ctrl+shift+a=toggle_visibility
-
-# Quick terminal appearance
-quick-terminal-position = center
+copy-on-select = true

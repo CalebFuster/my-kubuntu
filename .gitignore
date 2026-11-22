@@ -2,3 +2,6 @@
 local.sh
 local*.sh
 !local.sh.example
+
+# konsave exports are huge (themes/icons) — never commit them.
+*.knsv

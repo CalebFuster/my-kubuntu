@@ -14,20 +14,10 @@ HOOK_DST="/etc/initramfs-tools/hooks/fake-hdmi-edid"
 GRUB_DROPIN="/etc/default/grub.d/90-fake-hdmi.cfg"
 
 # --- only on Lenovo desktops ---
-vendor="$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null || true)"
-chassis="$(cat /sys/class/dmi/id/chassis_type 2>/dev/null || true)"
 case "${FAKE_HDMI:-auto}" in
     0) info "FAKE_HDMI=0: skipping fake HDMI monitor"; return 0 ;;
     1) ;;
-    *)
-        # SMBIOS chassis types: 3-7 desktop/tower, 13 all-in-one,
-        # 15/16 space-saving, 35/36 mini PC / stick.
-        case "$chassis" in 3|4|5|6|7|13|15|16|35|36) is_desktop=1 ;; *) is_desktop=0 ;; esac
-        if [ "$vendor" != "LENOVO" ] || [ "$is_desktop" -ne 1 ]; then
-            info "not a Lenovo desktop (vendor '${vendor:-?}', chassis type ${chassis:-?}); skipping"
-            return 0
-        fi
-        ;;
+    *) is_lenovo_desktop || { info "not a Lenovo desktop; skipping"; return 0; } ;;
 esac
 
 # --- the connector must exist ---

@@ -1,0 +1,15 @@
+#!/bin/sh
+# Installed by Linux-Setup (modules/76-fake-hdmi.sh).
+# Puts the fake-monitor EDID into every initramfs, so the GPU driver finds it
+# at boot for new kernels too, not only the one running at install time.
+PREREQ=""
+prereqs() { echo "$PREREQ"; }
+case "$1" in
+    prereqs) prereqs; exit 0 ;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+EDID=/lib/firmware/edid/hdmi_edid.bin
+[ -f "$EDID" ] && copy_file firmware "$EDID"
+exit 0

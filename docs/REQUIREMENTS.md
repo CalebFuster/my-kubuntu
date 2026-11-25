@@ -91,6 +91,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **Swap: zram + existing swapfile.** `systemd-zram-generator` makes a compressed swap in RAM (half of RAM, zstd, priority 100), used before the installer's disk swapfile (kept as overflow).
 - **Automatic updates: security only** (Ubuntu default, enforced via `/etc/apt/apt.conf.d/20auto-upgrades`). Everything else is updated with the `update` alias or Discover.
 - **Hostname: asked at the start of the install**, with the current name as default (Enter keeps it). `-y` keeps the current name; `HOSTNAME_NEW=name` sets it without a prompt. Validated (a-z, 0-9, `-`), and `/etc/hosts` is kept in sync.
+- **Fake HDMI monitor (Lenovo desktops only)** (`modules/76-fake-hdmi.sh`): without a monitor plugged in, a headless desktop has no screen for RDP to share. A fake EDID (`system/fake-hdmi-edid.bin`, 256 bytes, Lenovo panel) goes to `/lib/firmware/edid/hdmi_edid.bin`. An initramfs hook copies it into **every** kernel's initramfs, because a plain `update-initramfs -u` only covered the kernel running at the time. A GRUB drop-in (`/etc/default/grub.d/90-fake-hdmi.cfg`) adds `video=HDMI-A-2:e drm.edid_firmware=HDMI-A-2:edid/hdmi_edid.bin`, unless `/etc/default/grub` already has it. Runs only when DMI says vendor `LENOVO` and a desktop chassis type; laptops are skipped. `FAKE_HDMI=1|0` forces it on or off, and `FAKE_HDMI_PORT=` picks another connector. GRUB only: the old rEFInd entry hard-coded one kernel's initrd and broke on kernel updates.
 - **Locale, keyboard, timezone: left as chosen in the Kubuntu installer** (peers in Berlin and Barcelona differ). Only NTP time sync is turned on.
 
 ## 5. Open questions
@@ -105,5 +106,6 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - Waterfox WhiteSur look and Vivaldi native frame (headless can't render the browser UI).
 - KDE look after login (run `konsave -s before-linux-setup` first on a machine you care about).
 - RDP connection (port 3389) and OpenLogi with a real mouse.
+- Fake HDMI on a Lenovo desktop after a kernel update: `lsinitramfs /boot/initrd.img-$(uname -r) | grep edid` and `HDMI-A-2` reporting `connected` with nothing plugged in.
 - Snap removal of Firefox/Thunderbird; zram active (`swapon --show`); hostname change.
 - amd64: Node via nvm (the emulator here can't unpack Node's tarball).

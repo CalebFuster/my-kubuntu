@@ -2,8 +2,9 @@
 # Linux instance auto-installer.
 # Usage: sh install.sh [--list] [--only NAME[,NAME]] [--skip NAME[,NAME]] [--dry-run] [-y]
 
-# Re-exec under bash when launched via `sh` (dash on Debian/Ubuntu).
-if [ -z "${BASH_VERSION:-}" ]; then
+# Re-exec under bash when launched via `sh`: dash on Debian/Ubuntu, or bash in
+# POSIX mode (e.g. macOS /bin/sh), which rejects process substitution.
+if [ -z "${BASH_VERSION:-}" ] || case ":${SHELLOPTS:-}:" in *:posix:*) true ;; *) false ;; esac; then
     exec bash "$0" "$@"
 fi
 

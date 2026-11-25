@@ -47,7 +47,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 | Quantica apt (`http://10.13.10.6/q3d-ppa-pi`, key `q3d-ppa-pi.asc`) | SEGGER J-Link | ? | From `fw_scripts/raspberry_pi/setup_pi.sh`. Office network/VPN only, plain HTTP. Built for the Raspberry Pis: **unverified** whether it has a `resolute` suite or amd64 builds. Only added when it serves `jlink` for this machine's release+arch, so it can't break `apt update`. |
 
 ### Packages
-- **Base CLI:** curl, wget, git, vim, neovim, tmux, htop, unzip, zoxide, fzf, bash-completion, ca-certificates.
+- **Base CLI:** curl, wget, git, vim, neovim, tmux, htop, unzip, zoxide, fzf, bash-completion, ca-certificates, net-tools.
 - **C/C++:** build-essential, pkg-config, cmake, ninja-build, gdb, clang, clang-format, clang-tidy, doxygen.
 - **Python:** deadsnakes **3.12 + 3.13** (+ `-dev`; 26.04 ships 3.14 as `python3`; change in `packages/python.txt`). deadsnakes publishes 26.04 packages for amd64 and arm64 (3.7–3.13, 3.15, 3.16). Plus `uv` (official installer, as uv isn't in Ubuntu's repos). **uv must only use system (deadsnakes) Pythons**: `UV_PYTHON_PREFERENCE=only-system`, `UV_PYTHON_DOWNLOADS=never`. No pipx: `uv tool install` replaces it.
 - **Venvs live in `~/.venv/<name>`** (one per tool/project, same as the Mac). This is a deliberate exception to the XDG rule. `UV_TOOL_DIR=~/.venv`, so `uv tool install konsave` → `~/.venv/konsave`, with the command linked into `~/.local/bin`. Shell helpers: `mkvenv NAME [PYVER]` and `venv NAME` (tab-completes).

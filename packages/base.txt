@@ -15,3 +15,4 @@ fzf
 zoxide
 zip
 xdg-utils
+net-tools

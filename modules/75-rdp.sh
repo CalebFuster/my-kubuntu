@@ -3,6 +3,8 @@
 #   - TLS certificate generated per machine (never copied between machines)
 #   - logins use this account's normal password (SystemUserEnabled)
 #   - starts with the Plasma session (port 3389)
+#   - Ubuntu's krdp 6.6.4 is replaced by a local rebuild with the upstream
+#     FreeRDP 3.32 auth fix (system/krdp/), else Windows App/mstsc can't log in
 
 CERT_DIR="$HOME/.local/share/krdpserver"
 CERT="$CERT_DIR/krdp.crt"
@@ -13,6 +15,26 @@ WANTS="$HOME/.config/systemd/user/plasma-workspace.target.wants"
 if [ "${DRY_RUN:-0}" -eq 0 ] && ! has krdpserver; then
     warn "krdpserver not installed; run the packages module first."
     return 0
+fi
+
+# --- patched krdp (FreeRDP 3.32 auth fix, KDE bug 526514) ---
+# Only replaces the exact broken Ubuntu build. Any newer Ubuntu krdp sorts above
+# the local "+extsec1" version, so it wins and this step does nothing.
+KRDP_BROKEN="6.6.4-0ubuntu1"
+KRDP_DEB="$ROOT_DIR/system/krdp/krdp_${KRDP_BROKEN}+extsec1_${ARCH}.deb"
+krdp_ver="$(dpkg-query -W -f '${Version}' krdp 2>/dev/null || true)"
+if [ "$krdp_ver" = "$KRDP_BROKEN" ]; then
+    if [ -f "$KRDP_DEB" ]; then
+        apt_get install -y "$KRDP_DEB"
+        if [ -d /run/systemd/system ] && systemctl --user is-active -q "$UNIT" 2>/dev/null; then
+            run systemctl --user restart "$UNIT"
+        fi
+        ok "krdp replaced with patched build (Windows App login fix)"
+    else
+        warn "no patched krdp for $ARCH; build it with system/krdp/build.sh (Windows App logins fail until then)."
+    fi
+elif [ "$krdp_ver" = "${KRDP_BROKEN}+extsec1" ]; then
+    info "patched krdp already installed"
 fi
 
 if [ ! -f "$CERT" ] || [ ! -f "$KEY" ]; then

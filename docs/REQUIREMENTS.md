@@ -31,6 +31,9 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - **Inbound SSH (remote access to the laptop):** `openssh-server`, key-only login, no root login (drop-in `/etc/ssh/sshd_config.d/10-linux-setup.conf`). Allowed keys live in `ssh/authorized_keys` (public keys only, with a comment saying whose key it is). The installer **adds** missing keys and never removes existing ones. Password login is only disabled once at least one key is in place.
 - Outgoing SSH: keys are **copied in manually**. The installer creates `~/.ssh` and `~/.ssh/config.d/` (700) and makes `Include config.d/*` the **first** line of `~/.ssh/config`. It creates the file if missing; otherwise it prepends the line and keeps a backup.
 - **RDP:** KDE's built-in **KRdp** server (`krdp`, 6.6.4 on 26.04) on port 3389, started with the Plasma session. Login uses the account's normal password (`SystemUserEnabled`). The TLS certificate is **generated on each machine** (`~/.local/share/krdpserver/`) and never copied.
+  - **Patched krdp:** Ubuntu's `6.6.4-0ubuntu1` can't log in Windows App or mstsc. FreeRDP 3.32 turned `ExtSecurity` (HYBRID_EX) on by default and KRdp never turns it off, so those clients always end up in an NLA login against an empty user list (`Could not find user in SAM database`), whatever the credentials. Fixed upstream in commit `573e40a9` (KDE bug 526514, KRdp 6.7/6.8), not backported to 6.6. `modules/75-rdp.sh` installs a local rebuild, `system/krdp/krdp_6.6.4-0ubuntu1+extsec1_amd64.deb`, made by `system/krdp/build.sh` (Docker, Ubuntu 26.04 container) from Ubuntu's source plus that one-line patch. It only replaces that exact Ubuntu version; any later Ubuntu krdp sorts higher and wins. arm64 needs its own build with the same script.
+  - **Clients:** with the fix, the server offers TLS only (no NLA), so save the username and password in the client: Windows clients may not prompt for them (KDE bug 496363). Username `user`, no domain.
+  - **Don't save the Remote Desktop page in System Settings with autostart unticked:** that turns off the autostart this module sets.
 - **Not adopted from the laptop** (personal): keyboard-clock sync service, VIA, keyboard layouts, power settings, VS Code settings, Remmina.
 
 ## 3. Software
@@ -105,7 +108,7 @@ What `install.sh` must do, and the constraints it runs under. Update this file w
 - Vivaldi policies load (`vivaldi://policy`).
 - Waterfox WhiteSur look and Vivaldi native frame (headless can't render the browser UI).
 - KDE look after login (run `konsave -s before-linux-setup` first on a machine you care about).
-- RDP connection (port 3389) and OpenLogi with a real mouse.
+- RDP connection (port 3389) from Windows App with the patched krdp, and OpenLogi with a real mouse.
 - Fake HDMI on a Lenovo desktop after a kernel update: `lsinitramfs /boot/initrd.img-$(uname -r) | grep edid` and `HDMI-A-2` reporting `connected` with nothing plugged in.
 - Snap removal of Firefox/Thunderbird; zram active (`swapon --show`); hostname change.
 - amd64: Node via nvm (the emulator here can't unpack Node's tarball).

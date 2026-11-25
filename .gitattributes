@@ -5,3 +5,4 @@ dotfiles/** text eol=lf
 # Binary blobs (e.g. the fake-monitor EDID) must never be touched.
 *.bin binary
 system/initramfs-hook-* text eol=lf
+*.deb binary

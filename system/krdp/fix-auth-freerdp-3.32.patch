@@ -1,0 +1,20 @@
+Description: Fix authentication with FreeRDP 3.32
+ FreeRDP 3.32 turned FreeRDP_ExtSecurity (HYBRID_EX) on by default. KRdp
+ turns NLA off and checks the password itself after TLS, but left
+ ExtSecurity at the default, so clients that request HYBRID_EX (Windows App,
+ mstsc) are forced into CredSSP/NTLM with no SAM file and always fail with
+ "Could not find user in SAM database".
+Origin: upstream, https://invent.kde.org/plasma/krdp/-/commit/573e40a91fec497f6f4ca17c306f3cc8d70aed05
+Bug-KDE: https://bugs.kde.org/show_bug.cgi?id=526514
+Forwarded: not-needed
+Last-Update: 2026-11-25
+--- a/src/RdpConnection.cpp
++++ b/src/RdpConnection.cpp
+@@ -354,6 +354,7 @@
+     freerdp_settings_set_bool(settings, FreeRDP_RdpSecurity, false);
+     freerdp_settings_set_bool(settings, FreeRDP_TlsSecurity, true);
+     freerdp_settings_set_bool(settings, FreeRDP_NlaSecurity, false);
++    freerdp_settings_set_bool(settings, FreeRDP_ExtSecurity, false);
+
+     freerdp_settings_set_uint32(settings, FreeRDP_OsMajorType, OSMAJORTYPE_UNIX);
+     // PSEUDO_XSERVER is apparently required for things to work properly.
